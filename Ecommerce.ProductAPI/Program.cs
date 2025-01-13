@@ -1,6 +1,19 @@
+using AutoMapper;
+using Ecommerce.ProductAPI.Mapper;
+using Ecommerce.ProductAPI.Model.Context;
+using Ecommerce.ProductAPI.Repository;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
+var dbConnection = builder.Configuration.GetConnectionString("MySqlDb");
 
 // Add services to the container.
+builder.Services.AddDbContext<MySQLContext>(options => options.UseMySql(dbConnection, ServerVersion.AutoDetect(dbConnection)));
+IMapper mapper = ProductMapper.RegisterMaps().CreateMapper();
+builder.Services.AddSingleton(mapper);
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
